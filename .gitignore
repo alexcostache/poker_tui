@@ -1,0 +1,5 @@
+.DS_Store
+.poker_tui
+# Ignore the built binary, but not the source folder
+/poker_tui
+!/cmd/poker_tui/
