@@ -23,7 +23,7 @@ func Deal(gs *GameState) {
 		applyAutoHold(&gs.Hand)
 	}
 	gs.Screen = ScreenHandDealt
-	gs.Message = "Choose cards to HOLD (1–5), then press Q to draw."
+	gs.Message = "Choose cards to HOLD (1–5), then press Space to draw."
 }
 
 // applyAutoHold holds high cards (J+) and any paired/tripped/quaded ranks.

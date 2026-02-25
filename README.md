@@ -21,11 +21,9 @@ A terminal-based Video Poker game (Jacks-or-Better) with gamble mode, XP/levelli
 
 | Key | Action |
 |-----|--------|
-| `Space` | Deal (idle) / Draw (holding phase) / Next hand (after result) |
+| `Space` | Deal (idle) / Draw (holding phase) / Gamble after win / Collect during gamble / Next hand |
 | `1`–`5` | Toggle HOLD for card at that position |
-| `Q` | Gamble after a win |
 | `1` / `2` | Red / Black guess in gamble mode |
-| `C` | Collect winnings during gamble |
 | `+` / `-` | Increase / decrease bet (1–50, idle only) |
 | `?` | Help overlay (keybinds + paytable + gamble rules) |
 | `H` | Stats / high score screen |
@@ -48,10 +46,10 @@ A terminal-based Video Poker game (Jacks-or-Better) with gamble mode, XP/levelli
 
 ## Gamble Mode
 
-After a win, press `Q` to gamble your winnings. A card is drawn face-up; guess Red (`1`) or Black (`2`):
+After a win, press `Space` to gamble your winnings. A card is drawn face-up; guess Red (`1`) or Black (`2`):
 - Correct → pot doubles (up to 5 stages, maximum ×32).
 - Wrong → winnings are lost.
-- Press `C` at any stage to collect your current pot.
+- Press `Space` at any stage to collect your current pot.
 
 ## Winning Card Highlight
 
@@ -76,6 +74,19 @@ make build
 # Cross-compile
 make build-linux
 make build-windows
+```
+
+Windows PowerShell:
+
+```powershell
+# Build poker_tui.exe for Windows (amd64 by default)
+.\build.ps1
+
+# Optional: choose architecture/output
+.\build.ps1 -Arch arm64 -Output poker_tui-arm64.exe
+
+# Or use Go directly
+go build -o poker_tui.exe ./cmd/poker_tui
 ```
 
 ## Persistence

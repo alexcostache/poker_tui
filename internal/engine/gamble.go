@@ -23,7 +23,7 @@ func StartGamble(gs *GameState) {
 	}
 	gs.Screen = ScreenGambleStage
 	drawGambleCard(gs)
-	gs.Message = "GAMBLE! Guess the colour — R = Red, B = Black. C = Collect."
+	gs.Message = "GAMBLE! Guess the colour — 1 = Red, 2 = Black. Space = Collect."
 }
 
 func drawGambleCard(gs *GameState) {
@@ -56,7 +56,7 @@ func GambleGuess(gs *GameState, choice string) {
 			return
 		}
 		drawGambleCard(gs)
-		gs.Message = "Correct! Pot: " + creditStr(gs.Gamble.CurrentPot) + ". Keep going? (R/B) or Collect (C)."
+		gs.Message = "Correct! Pot: " + creditStr(gs.Gamble.CurrentPot) + ". Keep going? (1/2) or Collect (Space)."
 	} else {
 		step.Outcome = "lose"
 		step.PotAfter = 0

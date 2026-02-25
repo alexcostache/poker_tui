@@ -140,9 +140,11 @@ func (m Model) keyHints() string {
 	case engine.ScreenHandResolved:
 		gg := ""
 		if gs.LastResult.IsGambleEligible {
-			gg = "Q gamble  "
+			gg = "Space gamble"
+		} else {
+			gg = "Space next"
 		}
-		hints = []string{gg + "Space next", "? help", "H stats", "O options"}
+		hints = []string{gg, "? help", "H stats", "O options"}
 	}
 
 	parts := make([]string, len(hints))
@@ -190,7 +192,7 @@ func (m Model) viewGamble() string {
 	if gs.Message != "" {
 		sb.WriteString(th.AccentStyle().Render(gs.Message) + "\n\n")
 	}
-	sb.WriteString(th.DimStyle().Render("[1] Red  [2] Black  [C] Collect") + "\n")
+	sb.WriteString(th.DimStyle().Render("[1] Red  [2] Black  [Space] Collect") + "\n")
 	return sb.String()
 }
 
@@ -220,9 +222,8 @@ func (m Model) viewHelp() string {
 	sb.WriteString(th.AccentStyle().Render("Keys:") + "\n")
 
 	keys := [][2]string{
-		{"Space", "Deal / Draw / Next hand (context-aware)"},
+		{"Space", "Deal / Draw / Gamble / Collect / Next hand"},
 		{"1–5", "Toggle HOLD for card position"},
-		{"Q", "GAMBLE (after a win)"},
 		{"+/-", "Increase / decrease bet"},
 		{"?", "This help screen"},
 		{"H", "Stats / high score"},
@@ -239,9 +240,9 @@ func (m Model) viewHelp() string {
 	}
 
 	sb.WriteString("\n" + th.AccentStyle().Render("Gamble:") + "\n")
-	sb.WriteString(th.DimStyle().Render("  After a win, press Q to gamble.\n"))
+	sb.WriteString(th.DimStyle().Render("  After a win, press Space to gamble.\n"))
 	sb.WriteString(th.DimStyle().Render("  Guess 1 (Red) or 2 (Black) to double or lose your winnings.\n"))
-	sb.WriteString(th.DimStyle().Render("  Press C to collect at any stage.\n"))
+	sb.WriteString(th.DimStyle().Render("  Press Space to collect at any stage.\n"))
 	sb.WriteString(th.DimStyle().Render("  Up to 5 stages (x32 max).\n"))
 
 	sb.WriteString("\n" + th.DimStyle().Render("[ESC / Q / ?] close") + "\n")

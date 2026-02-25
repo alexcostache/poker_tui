@@ -2,4 +2,8 @@
 .poker_tui
 # Ignore the built binary, but not the source folder
 /poker_tui
+/poker_tui.exe
+/.gocache/
+/.gomodcache/
+/.gopath/
 !/cmd/poker_tui/

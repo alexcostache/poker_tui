@@ -154,13 +154,12 @@ func (m Model) handleHandResolved(key string) (tea.Model, tea.Cmd) {
 	gs := m.gs
 	switch key {
 	case " ":
-		engine.NextHand(gs)
-		return m, doSave(gs)
-	case "q", "Q":
 		if gs.LastResult.IsGambleEligible {
 			engine.StartGamble(gs)
-			return m, doSave(gs)
+		} else {
+			engine.NextHand(gs)
 		}
+		return m, doSave(gs)
 	case "?":
 		engine.OpenHelp(gs)
 		return m, nil
@@ -186,7 +185,7 @@ func (m Model) handleGamble(key string) (tea.Model, tea.Cmd) {
 	case "2":
 		engine.GambleGuess(gs, "black")
 		return m, doSave(gs)
-	case "c", "C":
+	case " ":
 		engine.CollectGamble(gs)
 		return m, doSave(gs)
 	}
