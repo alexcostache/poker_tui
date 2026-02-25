@@ -23,7 +23,7 @@ func StartGamble(gs *GameState) {
 	}
 	gs.Screen = ScreenGambleStage
 	drawGambleCard(gs)
-	gs.Message = "GAMBLE! Guess the colour — 1 = Red, 2 = Black. Space = Collect."
+	gs.Message = "Pick 1=Red, 2=Black, Space=Collect."
 }
 
 func drawGambleCard(gs *GameState) {
@@ -56,7 +56,7 @@ func GambleGuess(gs *GameState, choice string) {
 			return
 		}
 		drawGambleCard(gs)
-		gs.Message = "Correct! Pot: " + creditStr(gs.Gamble.CurrentPot) + ". Keep going? (1/2) or Collect (Space)."
+		gs.Message = "Correct. Pot " + creditStr(gs.Gamble.CurrentPot) + ". 1/2 or Space."
 	} else {
 		step.Outcome = "lose"
 		step.PotAfter = 0
@@ -65,7 +65,7 @@ func GambleGuess(gs *GameState, choice string) {
 		gs.Gamble.History = append(gs.Gamble.History, step)
 		gs.Gamble.Active = false
 		gs.Screen = ScreenGambleResult
-		gs.Message = "Wrong! Gamble lost. Press Space for next hand."
+		gs.Message = "Wrong. Pot lost. Space for next hand."
 	}
 }
 
@@ -86,7 +86,7 @@ func collectGamble(gs *GameState) {
 	gs.Stats.LifetimeDelta = gs.Credits - DefaultCredits
 	gs.Gamble.Active = false
 	gs.Screen = ScreenGambleResult
-	gs.Message = "Collected " + creditStr(gs.Gamble.CurrentPot) + " credits! Press Space for next hand."
+	gs.Message = "Collected " + creditStr(gs.Gamble.CurrentPot) + ". Space for next hand."
 }
 
 func GambleCurrentCard(gs *GameState) game.Card {

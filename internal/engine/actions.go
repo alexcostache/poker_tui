@@ -23,7 +23,7 @@ func Deal(gs *GameState) {
 		applyAutoHold(&gs.Hand)
 	}
 	gs.Screen = ScreenHandDealt
-	gs.Message = "Choose cards to HOLD (1–5), then press Space to draw."
+	gs.Message = "Hold 1-5, then Space to draw."
 }
 
 // applyAutoHold holds high cards (J+) and any paired/tripped/quaded ranks.
@@ -87,7 +87,7 @@ func resolveHand(gs *GameState) {
 		// XP
 		gs.XP += payout
 		gs.Level = xpToLevel(gs.XP)
-		gs.Message = "Winner! " + result.Name + " — +" + creditStr(payout) + " credits."
+		gs.Message = "Win: " + result.Name + " +" + creditStr(payout)
 	} else {
 		gs.Stats.HandsLost++
 		if gs.Stats.CurrentStreak > 0 {
@@ -95,7 +95,7 @@ func resolveHand(gs *GameState) {
 		} else {
 			gs.Stats.CurrentStreak--
 		}
-		gs.Message = result.Name + " — better luck next time."
+		gs.Message = result.Name + " (no win)"
 	}
 	gs.Stats.TotalWagered += gs.Bet
 	gs.Stats.LifetimeDelta = gs.Credits - DefaultCredits

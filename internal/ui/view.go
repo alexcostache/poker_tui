@@ -134,9 +134,9 @@ func (m Model) keyHints() string {
 
 	switch gs.Screen {
 	case engine.ScreenMainIdle:
-		hints = []string{"Space deal", "+/- bet", "? help", "H stats", "O options", "^C quit"}
+		hints = []string{"Space", "+/-", "?", "H", "O", "^C"}
 	case engine.ScreenHandDealt:
-		hints = []string{"1-5 hold", "Space draw", "? help"}
+		hints = []string{"1-5", "Space", "?"}
 	case engine.ScreenHandResolved:
 		gg := ""
 		if gs.LastResult.IsGambleEligible {
@@ -144,7 +144,7 @@ func (m Model) keyHints() string {
 		} else {
 			gg = "Space next"
 		}
-		hints = []string{gg, "? help", "H stats", "O options"}
+		hints = []string{gg, "?", "H", "O"}
 	}
 
 	parts := make([]string, len(hints))
@@ -167,17 +167,14 @@ func (m Model) viewGamble() string {
 	// Current pot
 	sb.WriteString(th.AccentStyle().Render(fmt.Sprintf("  Pot at risk: %d credits", gs.Gamble.CurrentPot)) + "\n\n")
 
-	// Vertical progress bar
-	sb.WriteString(VerticalProgressBar(th, gs.Gamble.Stage, gs.Gamble.MaxStages))
+	progressBlock := VerticalProgressBar(th, gs.Gamble.Stage, gs.Gamble.MaxStages)
+	cardBlock := indent(RenderGambleCardBack(gs.Options.CardDesign, th), "  ")
+	sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, progressBlock, "   ", cardBlock))
 	sb.WriteString("\n")
-
-	// Current card
-	cardStr := RenderGambleCard(gs.Gamble.CurrentCard, gs.Options.CardDesign, th)
-	sb.WriteString("  Card drawn:\n" + indent(cardStr, "  ") + "\n")
 
 	// History
 	if len(gs.Gamble.History) > 0 {
-		sb.WriteString("  History: ")
+		sb.WriteString("  Hist: ")
 		for _, step := range gs.Gamble.History {
 			icon := "✓"
 			if step.Outcome == "lose" {
@@ -205,6 +202,11 @@ func (m Model) viewGambleResult() string {
 	sb.WriteString(th.TitleStyle().Render("  *** GAMBLE RESULT ***") + "\n\n")
 	sb.WriteString(VerticalProgressBar(th, gs.Gamble.Stage, gs.Gamble.MaxStages))
 	sb.WriteString("\n")
+	if n := len(gs.Gamble.History); n > 0 {
+		revealed := gs.Gamble.History[n-1].Card
+		cardStr := RenderGambleCard(revealed, gs.Options.CardDesign, th)
+		sb.WriteString("  Revealed card:\n" + indent(cardStr, "  ") + "\n\n")
+	}
 	if gs.Message != "" {
 		sb.WriteString(th.WinStyle().Render(gs.Message) + "\n\n")
 	}

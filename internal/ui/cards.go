@@ -60,6 +60,20 @@ func RenderGambleCard(card game.Card, design engine.CardDesign, th Theme) string
 	return strings.Join(lines, "\n")
 }
 
+// RenderGambleCardBack renders a face-down card for the gamble choose phase.
+func RenderGambleCardBack(design engine.CardDesign, th Theme) string {
+	var lines []string
+	switch design {
+	case engine.DesignMinimal:
+		lines = renderCardBackMinimal(th)
+	case engine.DesignWide:
+		lines = renderCardBackWide(th)
+	default:
+		lines = renderCardBackClassic(th)
+	}
+	return strings.Join(lines, "\n")
+}
+
 // renderCard renders one card according to design. Returns a slice of lines (equal width).
 func renderCard(card game.Card, design engine.CardDesign, th Theme, highlight bool) []string {
 	switch design {
@@ -206,6 +220,66 @@ func renderWide(card game.Card, th Theme, highlight bool) []string {
 		row(blank),
 		row(blank),
 		row(vfillLeft(rank, iw)),
+		bs.Render("└" + border + "┘"),
+	}
+}
+
+func renderCardBackClassic(th Theme) []string {
+	iw := innerWidth(engine.DesignClassic) // 9
+	border := strings.Repeat("─", iw)
+	pattern := strings.Repeat("░", iw)
+	bs := th.DimStyle()
+	cs := th.DimStyle()
+	row := func(inner string) string {
+		return bs.Render("│") + cs.Render(inner) + bs.Render("│")
+	}
+	return []string{
+		bs.Render("┌" + border + "┐"),
+		row(pattern),
+		row(pattern),
+		row(pattern),
+		row(pattern),
+		row(pattern),
+		bs.Render("└" + border + "┘"),
+	}
+}
+
+func renderCardBackMinimal(th Theme) []string {
+	iw := innerWidth(engine.DesignMinimal) // 7
+	border := strings.Repeat("─", iw)
+	pattern := strings.Repeat("░", iw)
+	bs := th.DimStyle()
+	cs := th.DimStyle()
+	row := func(inner string) string {
+		return bs.Render("│") + cs.Render(inner) + bs.Render("│")
+	}
+	return []string{
+		bs.Render("┌" + border + "┐"),
+		row(pattern),
+		row(pattern),
+		row(pattern),
+		bs.Render("└" + border + "┘"),
+	}
+}
+
+func renderCardBackWide(th Theme) []string {
+	iw := innerWidth(engine.DesignWide) // 13
+	border := strings.Repeat("─", iw)
+	pattern := strings.Repeat("░", iw)
+	bs := th.DimStyle()
+	cs := th.DimStyle()
+	row := func(inner string) string {
+		return bs.Render("│") + cs.Render(inner) + bs.Render("│")
+	}
+	return []string{
+		bs.Render("┌" + border + "┐"),
+		row(pattern),
+		row(pattern),
+		row(pattern),
+		row(pattern),
+		row(pattern),
+		row(pattern),
+		row(pattern),
 		bs.Render("└" + border + "┘"),
 	}
 }
