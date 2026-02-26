@@ -130,6 +130,10 @@ func (th Theme) ErrorStyle() lipgloss.Style {
 	return lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000")).Bold(true)
 }
 
+func (th Theme) CorrectStyle() lipgloss.Style {
+	return lipgloss.NewStyle().Foreground(lipgloss.Color("#00E676")).Bold(true)
+}
+
 // BarSegment returns a coloured bar segment character.
 func (th Theme) BarSegment(filled bool) string {
 	if filled {

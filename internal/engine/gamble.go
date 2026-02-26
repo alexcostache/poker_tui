@@ -31,8 +31,17 @@ func drawGambleCard(gs *GameState) {
 	gs.Gamble.Revealed = false
 }
 
+// GambleAdvance draws the next card after a correct guess has been shown to the player.
+func GambleAdvance(gs *GameState) {
+	if gs.Screen != ScreenGambleStage || !gs.Gamble.Revealed {
+		return
+	}
+	drawGambleCard(gs)
+	gs.Message = "Pick 1=Red, 2=Black, Space=Collect."
+}
+
 func GambleGuess(gs *GameState, choice string) {
-	if gs.Screen != ScreenGambleStage {
+	if gs.Screen != ScreenGambleStage || gs.Gamble.Revealed {
 		return
 	}
 	card := gs.Gamble.CurrentCard
@@ -55,8 +64,7 @@ func GambleGuess(gs *GameState, choice string) {
 			collectGamble(gs)
 			return
 		}
-		drawGambleCard(gs)
-		gs.Message = "Correct. Pot " + creditStr(gs.Gamble.CurrentPot) + ". 1/2 or Space."
+		gs.Message = "Correct! Pot " + creditStr(gs.Gamble.CurrentPot) + ". [Space] Next."
 	} else {
 		step.Outcome = "lose"
 		step.PotAfter = 0

@@ -178,6 +178,15 @@ func (m Model) handleHandResolved(key string) (tea.Model, tea.Cmd) {
 
 func (m Model) handleGamble(key string) (tea.Model, tea.Cmd) {
 	gs := m.gs
+	// Card revealed (correct guess shown) — any meaningful key advances to next card.
+	if gs.Gamble.Revealed {
+		switch key {
+		case " ", "enter", "1", "2":
+			engine.GambleAdvance(gs)
+			return m, doSave(gs)
+		}
+		return m, nil
+	}
 	switch key {
 	case "1":
 		engine.GambleGuess(gs, "red")

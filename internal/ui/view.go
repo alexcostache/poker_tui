@@ -168,7 +168,12 @@ func (m Model) viewGamble() string {
 	sb.WriteString(th.AccentStyle().Render(fmt.Sprintf("  Pot at risk: %d credits", gs.Gamble.CurrentPot)) + "\n\n")
 
 	progressBlock := VerticalProgressBar(th, gs.Gamble.Stage, gs.Gamble.MaxStages)
-	cardBlock := indent(RenderGambleCardBack(gs.Options.CardDesign, th), "  ")
+	var cardBlock string
+	if gs.Gamble.Revealed {
+		cardBlock = indent(RenderGambleCard(gs.Gamble.CurrentCard, gs.Options.CardDesign, th), "  ")
+	} else {
+		cardBlock = indent(RenderGambleCardBack(gs.Options.CardDesign, th), "  ")
+	}
 	sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, progressBlock, "   ", cardBlock))
 	sb.WriteString("\n")
 
@@ -176,20 +181,26 @@ func (m Model) viewGamble() string {
 	if len(gs.Gamble.History) > 0 {
 		sb.WriteString("  Hist: ")
 		for _, step := range gs.Gamble.History {
-			icon := "✓"
-			if step.Outcome == "lose" {
-				icon = "✗"
-			}
-			sb.WriteString(fmt.Sprintf("[%s %s] ", icon, step.Card.String()))
+			sb.WriteString(gambleHistoryEntry(step, th) + " ")
 		}
 		sb.WriteString("\n")
 	}
 
 	sb.WriteString("\n")
 	if gs.Message != "" {
-		sb.WriteString(th.AccentStyle().Render(gs.Message) + "\n\n")
+		var msgStyle lipgloss.Style
+		if gs.Gamble.Revealed {
+			msgStyle = th.CorrectStyle()
+		} else {
+			msgStyle = th.AccentStyle()
+		}
+		sb.WriteString(msgStyle.Render(gs.Message) + "\n\n")
 	}
-	sb.WriteString(th.DimStyle().Render("[1] Red  [2] Black  [Space] Collect") + "\n")
+	if gs.Gamble.Revealed {
+		sb.WriteString(th.DimStyle().Render("[Space] Next stage") + "\n")
+	} else {
+		sb.WriteString(th.DimStyle().Render("[1] Red  [2] Black  [Space] Collect") + "\n")
+	}
 	return sb.String()
 }
 
@@ -200,15 +211,39 @@ func (m Model) viewGambleResult() string {
 
 	sb.WriteString(m.topBar() + "\n\n")
 	sb.WriteString(th.TitleStyle().Render("  *** GAMBLE RESULT ***") + "\n\n")
-	sb.WriteString(VerticalProgressBar(th, gs.Gamble.Stage, gs.Gamble.MaxStages))
-	sb.WriteString("\n")
+
+	// Current pot
+	sb.WriteString(th.AccentStyle().Render(fmt.Sprintf("  Pot at risk: %d credits", gs.Gamble.CurrentPot)) + "\n\n")
+
+	progressBlock := VerticalProgressBar(th, gs.Gamble.Stage, gs.Gamble.MaxStages)
 	if n := len(gs.Gamble.History); n > 0 {
 		revealed := gs.Gamble.History[n-1].Card
-		cardStr := RenderGambleCard(revealed, gs.Options.CardDesign, th)
-		sb.WriteString("  Revealed card:\n" + indent(cardStr, "  ") + "\n\n")
+		cardBlock := indent(RenderGambleCard(revealed, gs.Options.CardDesign, th), "  ")
+		sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, progressBlock, "   ", cardBlock))
+	} else {
+		sb.WriteString(progressBlock)
 	}
+	sb.WriteString("\n")
+
+	// History
+	if len(gs.Gamble.History) > 0 {
+		sb.WriteString("  Hist: ")
+		for _, step := range gs.Gamble.History {
+			sb.WriteString(gambleHistoryEntry(step, th) + " ")
+		}
+		sb.WriteString("\n")
+	}
+
+	sb.WriteString("\n")
 	if gs.Message != "" {
-		sb.WriteString(th.WinStyle().Render(gs.Message) + "\n\n")
+		n := len(gs.Gamble.History)
+		var msgStyle lipgloss.Style
+		if n > 0 && gs.Gamble.History[n-1].Outcome == "lose" {
+			msgStyle = th.ErrorStyle()
+		} else {
+			msgStyle = th.CorrectStyle()
+		}
+		sb.WriteString(msgStyle.Render(gs.Message) + "\n\n")
 	}
 	sb.WriteString(th.DimStyle().Render("[Space] next hand") + "\n")
 	return sb.String()
@@ -341,6 +376,16 @@ func (m Model) viewError() string {
 }
 
 // ---- helpers ----------------------------------------------------------------
+
+// gambleHistoryEntry renders a single gamble history step with suit-based colour.
+func gambleHistoryEntry(step engine.GambleStep, th Theme) string {
+	icon := "✓"
+	if step.Outcome == "lose" {
+		icon = "✗"
+	}
+	text := fmt.Sprintf("[%s %s]", icon, step.Card.String())
+	return th.CardStyle(step.Card.Suit.IsRed()).Render(text)
+}
 
 func indent(s, prefix string) string {
 	lines := strings.Split(strings.TrimRight(s, "\n"), "\n")
