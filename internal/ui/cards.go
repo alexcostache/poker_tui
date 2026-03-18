@@ -60,6 +60,85 @@ func RenderGambleCard(card game.Card, design engine.CardDesign, th Theme) string
 	return strings.Join(lines, "\n")
 }
 
+// RenderGambleCardFailed renders a card with a red X overlay, indicating a failed guess.
+func RenderGambleCardFailed(card game.Card, design engine.CardDesign, th Theme) string {
+	var lines []string
+	switch design {
+	case engine.DesignMinimal:
+		lines = renderMinimalFailed(card, th)
+	case engine.DesignWide:
+		lines = renderWideFailed(card, th)
+	default:
+		lines = renderClassicFailed(card, th)
+	}
+	return strings.Join(lines, "\n")
+}
+
+func renderClassicFailed(card game.Card, th Theme) []string {
+	rank := card.Rank.String()
+	suit := card.Suit.String()
+	iw := innerWidth(engine.DesignClassic) // 9
+	border := strings.Repeat("─", iw)
+	blank := strings.Repeat(" ", iw)
+	bs := th.CardFailBorderStyle()
+	cs := th.CardFailInnerStyle(card.Suit.IsRed())
+	row := func(inner string) string {
+		return bs.Render("│") + cs.Render(inner) + bs.Render("│")
+	}
+	return []string{
+		bs.Render("┌" + border + "┐"),
+		row(vfillRight(rank, iw)),
+		row(blank),
+		row(vcenterSuit(suit, iw)),
+		row(blank),
+		row(vfillLeft(rank, iw)),
+		bs.Render("└" + border + "┘"),
+	}
+}
+
+func renderMinimalFailed(card game.Card, th Theme) []string {
+	rank := card.Rank.String()
+	suit := card.Suit.String()
+	iw := innerWidth(engine.DesignMinimal) // 7
+	border := strings.Repeat("─", iw)
+	bs := th.CardFailBorderStyle()
+	cs := th.CardFailInnerStyle(card.Suit.IsRed())
+	row := func(inner string) string {
+		return bs.Render("│") + cs.Render(inner) + bs.Render("│")
+	}
+	return []string{
+		bs.Render("┌" + border + "┐"),
+		row(vfillRight(rank, iw)),
+		row(vcenterSuit(suit, iw)),
+		row(vfillLeft(rank, iw)),
+		bs.Render("└" + border + "┘"),
+	}
+}
+
+func renderWideFailed(card game.Card, th Theme) []string {
+	rank := card.Rank.String()
+	suit := card.Suit.String()
+	iw := innerWidth(engine.DesignWide) // 13
+	border := strings.Repeat("─", iw)
+	blank := strings.Repeat(" ", iw)
+	bs := th.CardFailBorderStyle()
+	cs := th.CardFailInnerStyle(card.Suit.IsRed())
+	row := func(inner string) string {
+		return bs.Render("│") + cs.Render(inner) + bs.Render("│")
+	}
+	return []string{
+		bs.Render("┌" + border + "┐"),
+		row(vfillRight(rank, iw)),
+		row(blank),
+		row(blank),
+		row(vcenterSuit(suit, iw)),
+		row(blank),
+		row(blank),
+		row(vfillLeft(rank, iw)),
+		bs.Render("└" + border + "┘"),
+	}
+}
+
 // RenderGambleCardBack renders a face-down card for the gamble choose phase.
 func RenderGambleCardBack(design engine.CardDesign, th Theme) string {
 	var lines []string

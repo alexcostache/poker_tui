@@ -89,6 +89,26 @@ func (th Theme) CardWinInnerStyle(isRed bool) lipgloss.Style {
 		Bold(true)
 }
 
+// CardFailBorderStyle returns the bright-red bg style used for failed-guess card borders.
+func (th Theme) CardFailBorderStyle() lipgloss.Style {
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color("#FF0000")).
+		Foreground(lipgloss.Color("#000000")).
+		Bold(true)
+}
+
+// CardFailInnerStyle returns the inner-cell style for a failed-guess card.
+func (th Theme) CardFailInnerStyle(isRed bool) lipgloss.Style {
+	fg := th.fg
+	if isRed {
+		fg = th.red
+	}
+	return lipgloss.NewStyle().
+		Background(lipgloss.Color("#380000")).
+		Foreground(fg).
+		Bold(true)
+}
+
 func (th Theme) HoldStyle() lipgloss.Style {
 	return lipgloss.NewStyle().Foreground(th.hold).Bold(true)
 }

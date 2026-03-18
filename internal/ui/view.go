@@ -45,7 +45,8 @@ func (m Model) viewMain() string {
 	sb.WriteString("\n\n")
 
 	// Cards area
-	if gs.Screen == engine.ScreenMainIdle {
+	neverDealt := gs.Hand.Cards[0].Rank == 0
+	if gs.Screen == engine.ScreenMainIdle && neverDealt {
 		sb.WriteString(m.emptyCardsArea())
 	} else {
 		var winCards [5]bool
@@ -209,24 +210,32 @@ func (m Model) viewGambleResult() string {
 	th := m.theme
 	var sb strings.Builder
 
+	n := len(gs.Gamble.History)
+	isLose := n > 0 && gs.Gamble.History[n-1].Outcome == "lose"
+
 	sb.WriteString(m.topBar() + "\n\n")
 	sb.WriteString(th.TitleStyle().Render("  *** GAMBLE RESULT ***") + "\n\n")
 
 	// Current pot
 	sb.WriteString(th.AccentStyle().Render(fmt.Sprintf("  Pot at risk: %d credits", gs.Gamble.CurrentPot)) + "\n\n")
 
-	progressBlock := VerticalProgressBar(th, gs.Gamble.Stage, gs.Gamble.MaxStages)
-	if n := len(gs.Gamble.History); n > 0 {
-		revealed := gs.Gamble.History[n-1].Card
-		cardBlock := indent(RenderGambleCard(revealed, gs.Options.CardDesign, th), "  ")
-		sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, progressBlock, "   ", cardBlock))
-	} else {
-		sb.WriteString(progressBlock)
+	if n > 0 {
+		lastCard := gs.Gamble.History[n-1].Card
+		if isLose {
+			// On a loss: reset the progress bar to 0 and show the card in red
+			progressBlock := VerticalProgressBar(th, 0, gs.Gamble.MaxStages)
+			cardBlock := indent(RenderGambleCardFailed(lastCard, gs.Options.CardDesign, th), "  ")
+			sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, progressBlock, "   ", cardBlock))
+		} else {
+			progressBlock := VerticalProgressBar(th, gs.Gamble.Stage, gs.Gamble.MaxStages)
+			cardBlock := indent(RenderGambleCard(lastCard, gs.Options.CardDesign, th), "  ")
+			sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, progressBlock, "   ", cardBlock))
+		}
 	}
 	sb.WriteString("\n")
 
 	// History
-	if len(gs.Gamble.History) > 0 {
+	if n > 0 {
 		sb.WriteString("  Hist: ")
 		for _, step := range gs.Gamble.History {
 			sb.WriteString(gambleHistoryEntry(step, th) + " ")
@@ -236,9 +245,8 @@ func (m Model) viewGambleResult() string {
 
 	sb.WriteString("\n")
 	if gs.Message != "" {
-		n := len(gs.Gamble.History)
 		var msgStyle lipgloss.Style
-		if n > 0 && gs.Gamble.History[n-1].Outcome == "lose" {
+		if isLose {
 			msgStyle = th.ErrorStyle()
 		} else {
 			msgStyle = th.CorrectStyle()

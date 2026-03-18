@@ -108,6 +108,9 @@ func NextHand(gs *GameState) {
 	if gs.Screen != ScreenHandResolved && gs.Screen != ScreenGambleResult {
 		return
 	}
+	if gs.Screen == ScreenGambleResult {
+		gs.Hand = game.Hand{} // clear cards so the idle view shows the empty placeholder
+	}
 	gs.Screen = ScreenMainIdle
 	gs.Message = ""
 }
