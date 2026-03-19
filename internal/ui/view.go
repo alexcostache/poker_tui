@@ -220,15 +220,20 @@ func (m Model) viewGambleResult() string {
 	sb.WriteString(th.AccentStyle().Render(fmt.Sprintf("  Pot at risk: %d credits", gs.Gamble.CurrentPot)) + "\n\n")
 
 	if n > 0 {
-		lastCard := gs.Gamble.History[n-1].Card
 		if isLose {
 			// On a loss: reset the progress bar to 0 and show the card in red
+			lastCard := gs.Gamble.History[n-1].Card
 			progressBlock := VerticalProgressBar(th, 0, gs.Gamble.MaxStages)
 			cardBlock := indent(RenderGambleCardFailed(lastCard, gs.Options.CardDesign, th), "  ")
 			sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, progressBlock, "   ", cardBlock))
 		} else {
 			progressBlock := VerticalProgressBar(th, gs.Gamble.Stage, gs.Gamble.MaxStages)
-			cardBlock := indent(RenderGambleCard(lastCard, gs.Options.CardDesign, th), "  ")
+			var cardBlock string
+			if gs.Gamble.Revealed {
+				cardBlock = indent(RenderGambleCard(gs.Gamble.CurrentCard, gs.Options.CardDesign, th), "  ")
+			} else {
+				cardBlock = indent(RenderGambleCardBack(gs.Options.CardDesign, th), "  ")
+			}
 			sb.WriteString(lipgloss.JoinHorizontal(lipgloss.Top, progressBlock, "   ", cardBlock))
 		}
 	}
